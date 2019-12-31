@@ -18,7 +18,7 @@
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <changeSet author="bburke@redhat.com" id="2.2.0">
+    <changeSet author="developer1@eupraxialabs.com" id="2.2.0">
 
         <addColumn tableName="ADMIN_EVENT_ENTITY">
             <column name="RESOURCE_TYPE" type="VARCHAR(64)"></column>
@@ -49,8 +49,24 @@
             </column>
             <column name="VALUE" type="VARCHAR(4000)"/>
         </createTable>
+        
+        <!--  Modified by Eupraxia Labs 8/15/2018 
         <modifyDataType tableName="CREDENTIAL" columnName="VALUE" newDataType="VARCHAR(4000)"/>
+        --> 
+        <addColumn tableName="CREDENTIAL">
+            <column name="VALUE_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
 
+        <sql>UPDATE CREDENTIAL SET VALUE_TEMP = VALUE;</sql>
+        
+        <dropColumn tableName="CREDENTIAL" columnName="VALUE"/>
+        
+        <renameColumn columnDataType="varchar(4000)"
+                      newColumnName="VALUE"
+                      oldColumnName="VALUE_TEMP"
+                      schemaName="public"
+                      tableName="CREDENTIAL"/>
+                      
         <addForeignKeyConstraint baseColumnNames="CREDENTIAL_ID" baseTableName="FED_CREDENTIAL_ATTRIBUTE" constraintName="FK_FED_CRED_ATTR" referencedColumnNames="ID" referencedTableName="FED_USER_CREDENTIAL"/>
         <addForeignKeyConstraint baseColumnNames="CREDENTIAL_ID" baseTableName="CREDENTIAL_ATTRIBUTE" constraintName="FK_CRED_ATTR" referencedColumnNames="ID" referencedTableName="CREDENTIAL"/>
 

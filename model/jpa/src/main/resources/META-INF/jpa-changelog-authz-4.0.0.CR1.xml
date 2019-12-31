@@ -17,7 +17,7 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
-    <changeSet author="psilva@redhat.com" id="authz-4.0.0.CR1">
+    <changeSet author="developer1@eupraxialabs.com" id="authz-4.0.0.CR1">
         <createTable tableName="RESOURCE_SERVER_PERM_TICKET">
             <column name="ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
@@ -52,10 +52,16 @@
         <addUniqueConstraint columnNames="OWNER, REQUESTER, RESOURCE_SERVER_ID, RESOURCE_ID, SCOPE_ID" constraintName="UK_FRSR6T700S9V50BU18WS5PMT" tableName="RESOURCE_SERVER_PERM_TICKET"/>
 
         <addColumn tableName="RESOURCE_SERVER_RESOURCE">
-            <column name="OWNER_MANAGED_ACCESS" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="OWNER_MANAGED_ACCESS" type="BOOLEAN">
                 <constraints nullable="false" />
             </column>
         </addColumn>
+        
+        <addDefaultValue tableName="RESOURCE_SERVER_RESOURCE"
+                         columnName="OWNER_MANAGED_ACCESS"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
 
         <addColumn tableName="RESOURCE_SERVER_RESOURCE">
             <column name="DISPLAY_NAME" type="VARCHAR(255)" >
@@ -70,13 +76,19 @@
         </addColumn>
 
         <addColumn tableName="REALM">
-            <column name="ALLOW_USER_MANAGED_ACCESS" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="ALLOW_USER_MANAGED_ACCESS" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+        <addDefaultValue tableName="REALM"
+                         columnName="ALLOW_USER_MANAGED_ACCESS"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
 
         <createTable tableName="RESOURCE_ATTRIBUTE">
-            <column name="ID" type="VARCHAR(36)" defaultValue="sybase-needs-something-here">
+            <column name="ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
             <column name="NAME" type="VARCHAR(255)">
@@ -87,8 +99,16 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        
 
         <addPrimaryKey columnNames="ID" constraintName="RES_ATTR_PK" tableName="RESOURCE_ATTRIBUTE"/>
         <addForeignKeyConstraint baseColumnNames="RESOURCE_ID" baseTableName="RESOURCE_ATTRIBUTE" constraintName="FK_5HRM2VLF9QL5FU022KQEPOVBR" referencedColumnNames="ID" referencedTableName="RESOURCE_SERVER_RESOURCE"/>
+        
+        <addDefaultValue tableName="RESOURCE_ATTRIBUTE"
+                         columnName="ID"
+                         columnDataType="varchar"
+                         schemaName="public"
+                         defaultValue="sybase-needs-something-here"/>
+        
     </changeSet>
 </databaseChangeLog>

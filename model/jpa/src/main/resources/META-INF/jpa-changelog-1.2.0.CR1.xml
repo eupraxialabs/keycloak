@@ -119,13 +119,24 @@
 
         <renameColumn tableName="CLIENT" newColumnName="CLIENT_ID" oldColumnName="NAME" columnDataType="VARCHAR(255)"/>
         <addColumn tableName="CLIENT">
-            <column name="CONSENT_REQUIRED" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="CONSENT_REQUIRED" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="NAME" type="VARCHAR(255)" />
         </addColumn>
+        
+        <!-- Removed unallowed BDR subcommand and added <addDefaultValue stanza 
+             8/1/2018 developer1@eupraxialabs.com -->
+             
+        <addDefaultValue tableName="CLIENT"
+                         columnName="CONSENT_REQUIRED"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        <!-- the end tag of </addDefaultValue> will not work. Use syntax above -->
+        
         <addColumn tableName="IDENTITY_PROVIDER">
-            <column name="ADD_TOKEN_ROLE" type="BOOLEAN" defaultValueBoolean="true">
+            <column name="ADD_TOKEN_ROLE" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

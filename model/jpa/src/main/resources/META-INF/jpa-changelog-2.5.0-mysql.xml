@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright 2016 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+     <changeSet author="dba1.eupraxialabs.com" id="2.5.0" dbms="mysql">
+         <customChange class="org.keycloak.connections.jpa.updater.liquibase.custom.MigrateUserFedToComponent"/>
+
+         <!-->
+         <modifyDataType tableName="OFFLINE_USER_SESSION" columnName="USER_ID" newDataType="VARCHAR(255)"/>
+         -->
+        <addColumn tableName="OFFLINE_USER_SESSION">
+            <column name="USER_ID_TEMP" type="VARCHAR(255)"/>
+        </addColumn>  
+        
+        <!-- Preserve column data before dropping it -->
+        
+        <sql>UPDATE OFFLINE_USER_SESSION SET USER_ID_TEMP = USER_ID;</sql>
+        
+        <dropColumn tableName="OFFLINE_USER_SESSION" columnName="USER_ID"/>
+        
+        <renameColumn columnDataType="varchar(255)"
+                      newColumnName="USER_ID"
+                      oldColumnName="USER_ID_TEMP"
+                      schemaName="keycloak"
+                      tableName="OFFLINE_USER_SESSION"/>
+     </changeSet>
+
+    <changeSet author="dba1.eupraxialabs.com" id="2.5.0-unicode-oracle">
+        <preConditions onSqlOutput="TEST" onFail="MARK_RAN">
+            <dbms type="oracle" />
+        </preConditions>
+
+
+        <modifyDataType tableName="AUTHENTICATION_FLOW" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+
+        
+        <addColumn tableName="AUTHENTICATION_FLOW">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+        </addColumn>  
+        
+        <!-- Preserve column data before dropping it -->
+        
+        <sql>UPDATE AUTHENTICATION_FLOW SET DESCRIPTION_TEMP = DESCRIPTION;</sql>
+        
+        <dropColumn tableName="AUTHENTICATION_FLOW" columnName="DESCRIPTION"/>
+        
+        <renameColumn columnDataType="nvarchar(255)"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="AUTHENTICATION_FLOW"/>
+                      
+        <!-- The remainder for dbms type = "oracle" deferred for now. Oracle RDBMS is not BDR-capable DJB 8/15/2018 -->
+        
+        <modifyDataType tableName="CLIENT_TEMPLATE" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+        
+        
+        
+        <modifyDataType tableName="RESOURCE_SERVER_POLICY" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+
+        <modifyDataType tableName="CLIENT" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="CLIENT" columnName="NAME" newDataType="NVARCHAR(255)"/>
+
+        <modifyDataType tableName="USER_ENTITY" columnName="FIRST_NAME" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="USER_ENTITY" columnName="LAST_NAME" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="USER_ENTITY" columnName="USERNAME" newDataType="NVARCHAR(255)"/>
+
+        <modifyDataType tableName="USERNAME_LOGIN_FAILURE" columnName="USERNAME" newDataType="NVARCHAR(255)"/>
+
+        <modifyDataType tableName="KEYCLOAK_GROUP" columnName="NAME" newDataType="NVARCHAR(255)"/>
+
+        <modifyDataType tableName="USER_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="GROUP_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="REALM_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <addColumn tableName="COMPONENT_CONFIG">
+            <column name="VALUE_NEW" type="NCLOB" />
+        </addColumn>
+        <sql>UPDATE COMPONENT_CONFIG SET VALUE_NEW = VALUE, VALUE = NULL</sql>
+        <dropColumn tableName="COMPONENT_CONFIG" columnName="VALUE"/>
+        <renameColumn tableName="COMPONENT_CONFIG" oldColumnName="VALUE_NEW" newColumnName="VALUE" columnDataType="NCLOB"/>
+<!--
+        <modifyDataType tableName="COMPONENT_CONFIG" columnName="VALUE" newDataType="NVARCHAR(2000)"/>
+-->
+
+        <modifyDataType tableName="KEYCLOAK_ROLE" columnName="NAME" newDataType="NVARCHAR(255)"/>
+        <modifyDataType tableName="KEYCLOAK_ROLE" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+      
+    </changeSet>
+
+    <changeSet author="dba1.eupraxialabs.com" id="2.5.0-unicode-other-dbs">
+        <preConditions onSqlOutput="TEST" onFail="MARK_RAN">
+            <not>
+                <dbms type="oracle" />
+            </not>
+        </preConditions>
+
+
+        <modifyDataType tableName="AUTHENTICATION_FLOW" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+
+ 
+        
+
+        
+        <addColumn tableName="AUTHENTICATION_FLOW">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+        </addColumn>  
+        
+        <!-- Preserve column data before dropping it -->
+        
+        <sql>UPDATE AUTHENTICATION_FLOW SET DESCRIPTION_TEMP = DESCRIPTION, DESCRIPTION = NULL</sql>
+        
+        <dropColumn tableName="AUTHENTICATION_FLOW" columnName="DESCRIPTION"/>
+
+        <sql>ALTER TABLE keycloak.AUTHENTICATION_FLOW change DESCRIPTION_TEMP DESCRIPTION NVARCHAR(255)</sql>
+        
+        <!--<renameColumn columnDataType="nvarchar(255)"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="AUTHENTICATION_FLOW"/>
+        -->
+        
+        <modifyDataType tableName="CLIENT_TEMPLATE" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+        
+         <!--
+         <addColumn tableName="CLIENT_TEMPLATE">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  
+        
+        Preserve column data before dropping it
+        
+        <sql>UPDATE CLIENT_TEMPLATE SET DESCRIPTION_TEMP = DESCRIPTION, DESCRIPTION = NULL</sql>
+        
+        <dropColumn tableName="CLIENT_TEMPLATE" columnName="DESCRIPTION"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="CLIENT_TEMPLATE"/>
+        -->
+                      
+        <modifyDataType tableName="RESOURCE_SERVER_POLICY" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="RESOURCE_SERVER_POLICY">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        
+        <!--<sql>UPDATE RESOURCE_SERVER_POLICY SET DESCRIPTION_TEMP = DESCRIPTION, DESCRIPTION = NULL</sql>
+        
+        <dropColumn tableName="RESOURCE_SERVER_POLICY" columnName="DESCRIPTION"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="RESOURCE_SERVER_POLICY"/>
+
+                      -->
+
+        <modifyDataType tableName="CLIENT" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+
+        <!--
+         <addColumn tableName="CLIENT">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE CLIENT SET DESCRIPTION_TEMP = DESCRIPTION, DESCRIPTION = NULL</sql>
+        
+        <dropColumn tableName="CLIENT" columnName="DESCRIPTION"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="CLIENT"/> -->
+        
+         <modifyDataType tableName="CLIENT" columnName="NAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="CLIENT">
+            <column name="NAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>   -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE CLIENT SET NAME_TEMP = NAME, NAME = NULL</sql>
+        
+        <dropColumn tableName="CLIENT" columnName="NAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="NAME"
+                      oldColumnName="NAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="CLIENT"/>-->
+
+        <dropUniqueConstraint constraintName="UK_RU8TT6T700S9V50BU18WS5HA6" tableName="USER_ENTITY"/>
+        
+        <modifyDataType tableName="USER_ENTITY" columnName="FIRST_NAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="USER_ENTITY">
+            <column name="FIRST_NAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE USER_ENTITY SET FIRST_NAME_TEMP = FIRST_NAME, FIRST_NAME = NULL</sql>
+        
+        <dropColumn tableName="USER_ENTITY" columnName="FIRST_NAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="FIRST_NAME"
+                      oldColumnName="FIRST_NAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="USER_ENTITY"/> -->
+        
+        <modifyDataType tableName="USER_ENTITY" columnName="LAST_NAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="USER_ENTITY">
+            <column name="LAST_NAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE USER_ENTITY SET LAST_NAME_TEMP = LAST_NAME, LAST_NAME = NULL</sql>
+        
+        <dropColumn tableName="USER_ENTITY" columnName="LAST_NAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="LAST_NAME"
+                      oldColumnName="LAST_NAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="USER_ENTITY"/> -->
+        
+        <modifyDataType tableName="USER_ENTITY" columnName="USERNAME" newDataType="NVARCHAR(255)"/>
+        <!--
+         <addColumn tableName="USER_ENTITY">
+            <column name="USERNAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>   -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE USER_ENTITY SET USERNAME_TEMP = USERNAME, USERNAME = NULL</sql>
+        
+        <dropColumn tableName="USER_ENTITY" columnName="USERNAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="USERNAME"
+                      oldColumnName="USERNAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="USER_ENTITY"/> -->
+        
+        <addUniqueConstraint columnNames="REALM_ID,USERNAME" constraintName="UK_RU8TT6T700S9V50BU18WS5HA6" tableName="USER_ENTITY"/>
+
+        <dropPrimaryKey constraintName="CONSTRAINT_17" tableName="USERNAME_LOGIN_FAILURE"/>
+        
+        <modifyDataType tableName="USERNAME_LOGIN_FAILURE" columnName="USERNAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="USERNAME_LOGIN_FAILURE">
+            <column name="USERNAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it 
+        
+             In this case, the update cannot occur since the table does not have a PK.
+             
+        -->
+        
+        <!--<sql>UPDATE USERNAME_LOGIN_FAILURE SET USERNAME_TEMP = USERNAME, USERNAME = NULL</sql> -->
+        <!--
+        <dropColumn tableName="USERNAME_LOGIN_FAILURE" columnName="USERNAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="USERNAME"
+                      oldColumnName="USERNAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="USERNAME_LOGIN_FAILURE"/> -->
+        
+        <addNotNullConstraint tableName="USERNAME_LOGIN_FAILURE" columnName="USERNAME" columnDataType="NVARCHAR(255)"/>
+        <addPrimaryKey columnNames="REALM_ID, USERNAME" constraintName="CONSTRAINT_17-2" tableName="USERNAME_LOGIN_FAILURE"/>
+
+        <modifyDataType tableName="KEYCLOAK_GROUP" columnName="NAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="KEYCLOAK_GROUP">
+            <column name="NAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>   -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE KEYCLOAK_GROUP SET NAME_TEMP = NAME, NAME = NULL</sql>
+        
+        <dropColumn tableName="KEYCLOAK_GROUP" columnName="NAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="NAME"
+                      oldColumnName="NAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="KEYCLOAK_GROUP"/> -->
+
+        <modifyDataType tableName="USER_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="USER_ATTRIBUTE">
+            <column name="VALUE_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE USER_ATTRIBUTE SET VALUE_TEMP = VALUE, VALUE = NULL</sql>
+        
+        <dropColumn tableName="USER_ATTRIBUTE" columnName="VALUE"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="VALUE"
+                      oldColumnName="VALUE_TEMP"
+                      schemaName="keycloak"
+                      tableName="USER_ATTRIBUTE"/> -->
+        
+        <modifyDataType tableName="GROUP_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="GROUP_ATTRIBUTE">
+            <column name="VALUE_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE GROUP_ATTRIBUTE SET VALUE_TEMP = VALUE, VALUE = NULL</sql>
+        
+        <dropColumn tableName="GROUP_ATTRIBUTE" columnName="VALUE"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="VALUE"
+                      oldColumnName="VALUE_TEMP"
+                      schemaName="keycloak"
+                      tableName="GROUP_ATTRIBUTE"/> -->
+        
+        <modifyDataType tableName="REALM_ATTRIBUTE" columnName="VALUE" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="REALM_ATTRIBUTE">
+            <column name="VALUE_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>   -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE REALM_ATTRIBUTE SET VALUE_TEMP = VALUE, VALUE = NULL</sql>
+        
+        <dropColumn tableName="REALM_ATTRIBUTE" columnName="VALUE"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="VALUE"
+                      oldColumnName="VALUE_TEMP"
+                      schemaName="keycloak"
+                      tableName="REALM_ATTRIBUTE"/> -->
+        
+        <modifyDataType tableName="COMPONENT_CONFIG" columnName="VALUE" newDataType="NVARCHAR(4000)"/>
+        <!--
+        <addColumn tableName="COMPONENT_CONFIG">
+            <column name="VALUE_TEMP" type="NVARCHAR(4000)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE COMPONENT_CONFIG SET VALUE_TEMP = VALUE, VALUE = NULL</sql>
+        
+        <dropColumn tableName="COMPONENT_CONFIG" columnName="VALUE"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="VALUE"
+                      oldColumnName="VALUE_TEMP"
+                      schemaName="keycloak"
+                      tableName="COMPONENT_CONFIG"/> -->
+
+        <dropUniqueConstraint constraintName="UK_J3RWUVD56ONTGSUHOGM184WW2-2" tableName="KEYCLOAK_ROLE"/>
+        
+        <modifyDataType tableName="KEYCLOAK_ROLE" columnName="NAME" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="KEYCLOAK_ROLE">
+            <column name="NAME_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>-->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE KEYCLOAK_ROLE SET NAME_TEMP = NAME, NAME = NULL</sql>
+        
+        <dropColumn tableName="KEYCLOAK_ROLE" columnName="NAME"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="NAME"
+                      oldColumnName="NAME_TEMP"
+                      schemaName="keycloak"
+                      tableName="KEYCLOAK_ROLE"/> -->
+        
+        <addUniqueConstraint columnNames="NAME,CLIENT_REALM_CONSTRAINT" constraintName="UK_J3RWUVD56ONTGSUHOGM184WW2-2" tableName="KEYCLOAK_ROLE"/>
+        
+        <modifyDataType tableName="KEYCLOAK_ROLE" columnName="DESCRIPTION" newDataType="NVARCHAR(255)"/>
+        <!--
+        <addColumn tableName="KEYCLOAK_ROLE">
+            <column name="DESCRIPTION_TEMP" type="NVARCHAR(255)"/>
+         </addColumn>  -->
+        
+        <!-- Preserve column data before dropping it -->
+        <!--
+        <sql>UPDATE KEYCLOAK_ROLE SET DESCRIPTION_TEMP = DESCRIPTION, DESCRIPTION = NULL</sql>
+        
+        <dropColumn tableName="KEYCLOAK_ROLE" columnName="DESCRIPTION"/>
+        
+        <renameColumn columnDataType="nvarchar"
+                      newColumnName="DESCRIPTION"
+                      oldColumnName="DESCRIPTION_TEMP"
+                      schemaName="keycloak"
+                      tableName="KEYCLOAK_ROLE"/> -->
+        
+    </changeSet>
+    
+    <changeSet author="dba1.eupraxialabs.com" id="2.5.0-duplicate-email-support" dbms="mysql">
+        <addColumn tableName="REALM">
+            <column name="LOGIN_WITH_EMAIL_ALLOWED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DUPLICATE_EMAILS_ALLOWED" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        
+        <addDefaultValue tableName="REALM"
+                         columnName="LOGIN_WITH_EMAIL_ALLOWED"
+                         columnDataType="boolean"
+                         schemaName="keycloak"
+                         defaultValueBoolean="true"/>
+                         
+        <addDefaultValue tableName="REALM"
+                         columnName="DUPLICATE_EMAILS_ALLOWED"
+                         columnDataType="boolean"
+                         schemaName="keycloak"
+                         defaultValueBoolean="false"/>
+    </changeSet>
+
+    <changeSet author="dba1.eupraxialabs.com" id="2.5.0-unique-group-names" dbms="mysql">
+        <preConditions onSqlOutput="TEST" onFail="MARK_RAN">
+            <not>
+                <dbms type="db2" /> <!-- exclude DB2 as it requires all fields to be non-NULL for unique constraints -->
+            </not>
+        </preConditions>
+         <addUniqueConstraint columnNames="REALM_ID,PARENT_GROUP,NAME" constraintName="SIBLING_NAMES" tableName="KEYCLOAK_GROUP"/>
+    </changeSet>
+
+</databaseChangeLog>

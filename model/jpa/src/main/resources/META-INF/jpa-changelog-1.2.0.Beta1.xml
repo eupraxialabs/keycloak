@@ -17,7 +17,7 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    <changeSet author="psilva@redhat.com" id="1.2.0.Beta1">
+    <changeSet author="developer1@eupraxialabs.com" id="1.2.0.Beta1">
         <preConditions onSqlOutput="TEST" onFail="MARK_RAN">
             <not>
                 <dbms type="db2" />
@@ -42,7 +42,7 @@
             <column name="PROTOCOL_MAPPER_NAME" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="CONSENT_REQUIRED" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="CONSENT_REQUIRED" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="CONSENT_TEXT" type="VARCHAR(255)"/>
@@ -50,6 +50,13 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        
+        <addDefaultValue tableName="PROTOCOL_MAPPER"
+                         columnName="CONSENT_REQUIRED"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        
         <createTable tableName="PROTOCOL_MAPPER_CONFIG">
             <column name="PROTOCOL_MAPPER_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
@@ -75,22 +82,41 @@
             <column name="INTERNAL_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="ENABLED" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="ENABLED" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="PROVIDER_ALIAS" type="VARCHAR(255)"/>
             <column name="PROVIDER_ID" type="VARCHAR(255)"/>
-            <column name="UPDATE_PROFILE_FIRST_LOGIN" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="UPDATE_PROFILE_FIRST_LOGIN" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="STORE_TOKEN" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="STORE_TOKEN" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="AUTHENTICATE_BY_DEFAULT" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="AUTHENTICATE_BY_DEFAULT" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="REALM_ID" type="VARCHAR(36)"/>
         </createTable>
+        
+        <addDefaultValue tableName="IDENTITY_PROVIDER"
+                         columnName="ENABLED"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        
+        <addDefaultValue tableName="IDENTITY_PROVIDER"
+                         columnName="UPDATE_PROFILE_FIRST_LOGIN"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+                         
+        <addDefaultValue tableName="IDENTITY_PROVIDER"
+                         columnName="STORE_TOKEN"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        
         <createTable tableName="IDENTITY_PROVIDER_CONFIG">
             <column name="IDENTITY_PROVIDER_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
@@ -107,10 +133,17 @@
             <column name="IDENTITY_PROVIDER_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
             </column>
-            <column name="RETRIEVE_TOKEN" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="RETRIEVE_TOKEN" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        
+        <addDefaultValue tableName="CLIENT_IDENTITY_PROV_MAPPING"
+                         columnName="RETRIEVE_TOKEN"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        
         <createTable tableName="REALM_SUPPORTED_LOCALES">
             <column name="REALM_ID" type="VARCHAR(36)">
                 <constraints nullable="false"/>
@@ -127,10 +160,22 @@
             <column name="VALUE" type="VARCHAR(2048)"/>
         </createTable>
         <addColumn tableName="CLIENT">
-            <column name="FRONTCHANNEL_LOGOUT" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="FRONTCHANNEL_LOGOUT" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+        <!-- Removed unallowed BDR subcommand and added <addDefaultValue stanza 
+             8/1/2018 developer1@eupraxialabs.com -->
+             
+        <addDefaultValue tableName="CLIENT"
+                         columnName="FRONTCHANNEL_LOGOUT"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        <!-- the end tag of </addDefaultValue> will not work. Use syntax above -->
+        
+        
         <addColumn tableName="USER_SESSION">
             <column name="USER_SESSION_STATE" type="INT" />
             <column name="BROKER_SESSION_ID" type="VARCHAR(255)" />
@@ -155,14 +200,33 @@
         <addUniqueConstraint columnNames="IDENTITY_PROVIDER_ID,CLIENT_ID" constraintName="UK_7CAELWNIBJI49AVXSRTUF6XJ12" tableName="CLIENT_IDENTITY_PROV_MAPPING"/>
         <addColumn tableName="REALM">
             <column name="LOGIN_LIFESPAN" type="INT"/>
-            <column name="INTERNATIONALIZATION_ENABLED" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="INTERNATIONALIZATION_ENABLED" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
             <column name="DEFAULT_LOCALE" type="VARCHAR(255)" />
-            <column name="REG_EMAIL_AS_USERNAME" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="REG_EMAIL_AS_USERNAME" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+         <!-- Removed unallowed BDR subcommand and added <addDefaultValue stanza 
+             8/1/2018 developer1@eupraxialabs.com -->
+             
+        <addDefaultValue tableName="REALM"
+                         columnName="INTERNATIONALIZATION_ENABLED"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+                         
+        <addDefaultValue tableName="REALM"
+                         columnName="REG_EMAIL_AS_USERNAME"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>                 
+                        
+        <!-- the end tag of </addDefaultValue> will not work. Use syntax above -->
+        
+        
 
         <!-- KEYCLOAK-1106 APPLICATION_ID and REALM_ID switched in REALM_APPLICATION table -->
         <dropForeignKeyConstraint baseTableName="REALM_APPLICATION" constraintName="FK_71S3P0DIUXAWWQQSA528UBY2Q" />

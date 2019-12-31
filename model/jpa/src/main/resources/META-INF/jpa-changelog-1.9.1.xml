@@ -24,8 +24,57 @@
             </not>
         </preConditions>
 
-        <modifyDataType tableName="REALM" columnName="PRIVATE_KEY" newDataType="VARCHAR(4000)"/>
+       
+        
+        <!-- These alter table commands are not allowed for BDR  Rewrite follows this:-->
+       <!-->
+         <modifyDataType tableName="REALM" columnName="PRIVATE_KEY" newDataType="VARCHAR(4000)"/>
         <modifyDataType tableName="REALM" columnName="PUBLIC_KEY" newDataType="VARCHAR(4000)"/>
         <modifyDataType tableName="REALM" columnName="CERTIFICATE" newDataType="VARCHAR(4000)"/>
+       -->
+       
+        <addColumn tableName="REALM">
+            <column name="PRIVATE_KEY_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET PRIVATE_KEY_TEMP = PRIVATE_KEY;</sql>
+        
+        <dropColumn tableName="REALM" columnName="PRIVATE_KEY"/>
+        
+        <renameColumn columnDataType="varchar(4000)"
+                      newColumnName="PRIVATE_KEY"
+                      oldColumnName="PRIVATE_KEY_TEMP"
+                      schemaName="public"
+                      tableName="REALM"/>
+                      
+        <addColumn tableName="REALM">
+            <column name="PUBLIC_KEY_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET PUBLIC_KEY_TEMP = PUBLIC_KEY;</sql>
+        
+        <dropColumn tableName="REALM" columnName="PUBLIC_KEY"/>
+        
+        <renameColumn columnDataType="varchar(4000)"
+                      newColumnName="PUBLIC_KEY"
+                      oldColumnName="PUBLIC_KEY_TEMP"
+                      schemaName="public"
+                      tableName="REALM"/>
+                      
+        <addColumn tableName="REALM">
+            <column name="CERTIFICATE_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET CERTIFICATE_TEMP = CERTIFICATE;</sql>
+        
+        <dropColumn tableName="REALM" columnName="CERTIFICATE"/>
+        
+        <renameColumn columnDataType="varchar (4000)"
+                      newColumnName="CERTIFICATE"
+                      oldColumnName="CERTIFICATE_TEMP"
+                      schemaName="public"
+                      tableName="REALM"/>
+        
+       <!-- This is the end of the 'alter table' modification for BDR -->
     </changeSet>
 </databaseChangeLog>

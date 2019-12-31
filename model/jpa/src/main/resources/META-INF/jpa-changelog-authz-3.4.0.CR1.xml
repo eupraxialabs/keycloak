@@ -17,7 +17,7 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.2.xsd">
-    <changeSet author="glavoie@gmail.com" id="authz-3.4.0.CR1-resource-server-pk-change-part1">
+    <changeSet author="developer1@eupraxialabs.com" id="authz-3.4.0.CR1-resource-server-pk-change-part1">
         <!-- Data migration to change the PK of RESOURCE_SERVER to use the CLIENT_ID. -->
         <addColumn tableName="RESOURCE_SERVER_POLICY">
             <column name="RESOURCE_SERVER_CLIENT_ID" type="VARCHAR(36)"/>
@@ -118,7 +118,13 @@
 
     <changeSet author="glavoie@gmail.com" id="authn-3.4.0.CR1-refresh-token-max-reuse">
         <addColumn tableName="REALM">
-            <column name="REFRESH_TOKEN_MAX_REUSE" type="INT" defaultValueNumeric="0"/>
+            <column name="REFRESH_TOKEN_MAX_REUSE" type="INT"/>
         </addColumn>
+        
+        <addDefaultValue tableName="REALM"
+                         columnName="REFRESH_TOKEN_MAX_REUSE"
+                         columnDataType="int"
+                         schemaName="public"
+                         defaultValueNumeric="0"/>
     </changeSet>
 </databaseChangeLog>

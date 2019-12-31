@@ -17,26 +17,46 @@
   -->
 
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    <changeSet author="mposolda@redhat.com" id="1.6.1_from15">
+    <changeSet author="developer1@eupraxialabs.com" id="1.6.1_from15">
 
         <preConditions onFail="MARK_RAN" onFailMessage="Upgrading from 1.6.0 version. Skipped 1.6.1_from15 changeSet and marked as ran" onSqlOutput="TEST">
             <not>
-                <changeSetExecuted id="1.6.0" author="mposolda@redhat.com" changeLogFile="META-INF/jpa-changelog-1.6.0.xml" />
+                <changeSetExecuted id="1.6.0" author="developer1@eupraxialabs.com" changeLogFile="META-INF/jpa-changelog-1.6.0.xml" />
             </not>
         </preConditions>
 
         <addColumn tableName="REALM">
-            <column name="OFFLINE_SESSION_IDLE_TIMEOUT" type="INT" defaultValueNumeric="0"/>
-            <column name="REVOKE_REFRESH_TOKEN" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="OFFLINE_SESSION_IDLE_TIMEOUT" type="INT"/>
+            <column name="REVOKE_REFRESH_TOKEN" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-
+    
+        <addDefaultValue tableName="REALM"
+                         columnName="OFFLINE_SESSION_IDLE_TIMEOUT"
+                         columnDataType="int"
+                         schemaName="public"
+                         defaultValueNumeric="0"/>
+                         
+        <addDefaultValue tableName="REALM"
+                         columnName="REVOKE_REFRESH_TOKEN"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+        
         <addColumn tableName="KEYCLOAK_ROLE">
-            <column name="SCOPE_PARAM_REQUIRED" type="BOOLEAN" defaultValueBoolean="false">
+            <column name="SCOPE_PARAM_REQUIRED" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        
+                         
+         <addDefaultValue tableName="KEYCLOAK_ROLE"
+                         columnName="SCOPE_PARAM_REQUIRED"
+                         columnDataType="boolean"
+                         schemaName="public"
+                         defaultValueBoolean="false"/>
+
 
         <addColumn tableName="CLIENT">
             <column name="ROOT_URL" type="VARCHAR(255)"/>
@@ -133,7 +153,7 @@
 
     </changeSet>
 
-    <changeSet author="mposolda@redhat.com" id="1.6.1">
+    <changeSet author="developer1@eupraxialabs.com" id="1.6.1">
     </changeSet>
 
 </databaseChangeLog>

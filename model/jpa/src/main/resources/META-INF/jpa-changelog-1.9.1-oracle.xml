@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright 2016 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet author="dba1.eupraxialabs.com" id="1.9.1" dbms="oracle">
+        <preConditions onSqlOutput="TEST" onFail="MARK_RAN">
+            <not>
+                <dbms type="db2" />
+            </not>
+        </preConditions>
+
+       
+        
+        <!-- These alter table commands are not allowed for BDR  Rewrite follows this:-->
+       <!-->
+         <modifyDataType tableName="REALM" columnName="PRIVATE_KEY" newDataType="VARCHAR(4000)"/>
+        <modifyDataType tableName="REALM" columnName="PUBLIC_KEY" newDataType="VARCHAR(4000)"/>
+        <modifyDataType tableName="REALM" columnName="CERTIFICATE" newDataType="VARCHAR(4000)"/>
+       -->
+       
+        <addColumn tableName="REALM">
+            <column name="PRIVATE_KEY_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET PRIVATE_KEY_TEMP = PRIVATE_KEY;</sql>
+        
+        <dropColumn tableName="REALM" columnName="PRIVATE_KEY"/>
+        
+        <renameColumn columnDataType="varchar(4000)"
+                      newColumnName="PRIVATE_KEY"
+                      oldColumnName="PRIVATE_KEY_TEMP"
+                      schemaName="keycloak"
+                      tableName="REALM"/>
+                      
+        <addColumn tableName="REALM">
+            <column name="PUBLIC_KEY_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET PUBLIC_KEY_TEMP = PUBLIC_KEY;</sql>
+        
+        <dropColumn tableName="REALM" columnName="PUBLIC_KEY"/>
+        
+        <renameColumn columnDataType="varchar(4000)"
+                      newColumnName="PUBLIC_KEY"
+                      oldColumnName="PUBLIC_KEY_TEMP"
+                      schemaName="keycloak"
+                      tableName="REALM"/>
+                      
+        <addColumn tableName="REALM">
+            <column name="CERTIFICATE_TEMP" type="VARCHAR(4000)"/>
+        </addColumn>
+
+        <sql>UPDATE REALM SET CERTIFICATE_TEMP = CERTIFICATE;</sql>
+        
+        <dropColumn tableName="REALM" columnName="CERTIFICATE"/>
+        
+        <renameColumn columnDataType="varchar (4000)"
+                      newColumnName="CERTIFICATE"
+                      oldColumnName="CERTIFICATE_TEMP"
+                      schemaName="keycloak"
+                      tableName="REALM"/>
+        
+       <!-- This is the end of the 'alter table' modification for BDR -->
+    </changeSet>
+</databaseChangeLog>
